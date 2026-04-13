@@ -842,7 +842,6 @@ function acSelect(uid, cls, key, school) {
       deptEl.innerHTML = '';
       deptEl.classList.remove('visible');
     }
-    // 학과 초기화
     if(cls && key) {
       if(!results[cls]) results[cls]={};
       if(!results[cls][key]) results[cls][key]={school:'',custom:'',cat:'',pct:'',dept:''};
@@ -850,7 +849,28 @@ function acSelect(uid, cls, key, school) {
     }
   }
 
-  if(cls && key) saveCell(cls, key, 'school', school);
+  if(cls && key) {
+    // results에 먼저 저장
+    if(!results[cls]) results[cls]={};
+    if(!results[cls][key]) results[cls][key]={school:'',custom:'',cat:'',pct:'',dept:''};
+    results[cls][key].school = school;
+    saveResults();
+
+    // 상태 배지 업데이트
+    const row = inp ? inp.closest('tr') : null;
+    if(row) {
+      const badge = row.querySelector('.status-badge');
+      if(badge) {
+        badge.className = 'status-badge status-done';
+        badge.textContent = '완료';
+      }
+    }
+
+    // Firebase에 저장
+    clearTimeout(saveCell._t);
+    saveCell._t = setTimeout(() => syncToSheet(cls, key, results[cls][key]), 1500);
+    renderOverview();
+  }
 }
 
 function acKey(e, uid, cls, key) {
