@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>포산중학교 고입 정보 시스템</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 :root {
   --bg:#f5f3ee; --surface:#fff; --border:#e2ddd5; --border-dark:#ccc7be;
@@ -265,7 +268,7 @@ header h1{font-family:'Noto Serif KR',serif;font-size:1.1rem;font-weight:600}
 
 </div>
 
-<script type="module">
+<script>
 // ── 데이터 ──
 const USERS = {
   "이선영":"301","박은진":"302","정지연":"303","이가혜":"304",
@@ -965,11 +968,8 @@ const firebaseConfig = {
   appId: "1:14183203344:web:b8e89410f97d00749f8095"
 };
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getDatabase(firebaseApp);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 function saveResults() {
   // 로컬 저장은 유지 (빠른 렌더링용)
@@ -992,7 +992,7 @@ function syncToSheet(cls, key, studentData) {
   if(!r.school && !r.custom && !r.pct) return;
   const safeCls = cls.replace(/-/g, '_');
   const safeKey = key.replace(/[.#$\[\]]/g, '_');
-  set(ref(db, `results/${safeCls}/${safeKey}`), {
+  db.ref(`results/${safeCls}/${safeKey}`).set({
     school: r.school||'', custom: r.custom||'',
     dept: r.dept||'', pct: r.pct||'',
     updatedAt: new Date().toLocaleString('ko-KR')
@@ -1003,14 +1003,14 @@ function syncToSheet(cls, key, studentData) {
 // 해당 반 전체 Firebase에서 삭제
 function clearClassData(cls) {
   const safeCls = cls.replace(/-/g, '_');
-  remove(ref(db, `results/${safeCls}`))
+  db.ref(`results/${safeCls}`).remove()
     .then(() => showSyncMsg('✓ 초기화됐어요'))
     .catch(() => showSyncMsg('⚠ 초기화 실패', true));
 }
 
-// Firebase 실시간 리스너 — 데이터 변경 시 자동 반영
+// Firebase 실시간 리스너
 function startRealtimeSync() {
-  onValue(ref(db, 'results'), (snapshot) => {
+  db.ref('results').on('value', (snapshot) => {
     const data = snapshot.val();
     if(!data) return;
     Object.entries(data).forEach(([safeCls, students]) => {
@@ -1039,7 +1039,7 @@ function manualLoad(btn) {
   btn.textContent = '불러오는 중...';
   btn.disabled = true;
   btn.style.opacity = '0.6';
-  get(ref(db, 'results')).then(snapshot => {
+  db.ref('results').get().then(snapshot => {
     const data = snapshot.val();
     if(data) {
       Object.entries(data).forEach(([safeCls, students]) => {
