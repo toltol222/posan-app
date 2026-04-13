@@ -989,7 +989,6 @@ function showSyncMsg(msg, isErr=false) {
 function syncToSheet(cls, key, studentData) {
   if(!cls || !key) return;
   const r = studentData || results[cls]?.[key] || {};
-  if(!r.school && !r.custom && !r.pct) return;
   const safeCls = cls.replace(/-/g, '__');
   const safeKey = encodeURIComponent(key).replace(/\./g, '%2E');
   db.ref(`results/${safeCls}/${safeKey}`).set({
