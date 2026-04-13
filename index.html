@@ -1009,21 +1009,21 @@ function showSyncMsg(msg, isErr=false) {
 function syncToSheet(cls, key, studentData) {
   if(!cls || !key) return;
   const r = studentData || results[cls]?.[key] || {};
-  // key에서 Firebase 금지문자만 제거 (한글 유지)
-  const safeCls = cls.replace(/-/g, '__');
-  const safeKey = key.replace(/[.#$\[\]/]/g, '_');
+  // Firebase 금지문자: . # $ [ ] /
+  const safeCls = cls.replace(/[.#$\[\]/]/g, '-');
+  const safeKey = key.replace(/[.#$\[\]/]/g, '-');
   db.ref(`results/${safeCls}/${safeKey}`).set({
     school: r.school||'', custom: r.custom||'',
     dept: r.dept||'', pct: r.pct||'',
     cls: cls, key: key,
     updatedAt: new Date().toLocaleString('ko-KR')
   }).then(() => showSyncMsg('✓ 저장됐어요'))
-    .catch(() => showSyncMsg('⚠ 저장 실패', true));
+    .catch((e) => { console.error(e); showSyncMsg('⚠ 저장 실패', true); });
 }
 
 // 해당 반 전체 Firebase에서 삭제
 function clearClassData(cls) {
-  const safeCls = cls.replace(/-/g, '__');
+  const safeCls = cls.replace(/[.#$\[\]/]/g, '-');
   db.ref(`results/${safeCls}`).remove()
     .then(() => showSyncMsg('✓ 초기화됐어요'))
     .catch(() => showSyncMsg('⚠ 초기화 실패', true));
@@ -1031,13 +1031,14 @@ function clearClassData(cls) {
 
 // Firebase 데이터 → results 반영
 function applyFirebaseData(data) {
-  // 시트에 있는 반은 완전히 교체
   const sheetResults = {};
   if(data) {
     Object.entries(data).forEach(([safeCls, students]) => {
+      if(!students) return;
       Object.entries(students).forEach(([safeKey, val]) => {
-        const cls = val.cls || safeCls.replace(/__/g, '-');
-        const key = val.key || decodeURIComponent(safeKey);
+        // cls와 key는 Firebase에 원본으로 저장해뒀음
+        const cls = val.cls || safeCls;
+        const key = val.key || safeKey;
         if(!sheetResults[cls]) sheetResults[cls] = {};
         sheetResults[cls][key] = {
           school: val.school||'', custom: val.custom||'',
@@ -1046,17 +1047,16 @@ function applyFirebaseData(data) {
       });
     });
   }
-  // Firebase에 있는 반만 교체 (없는 반은 로컬 유지)
   Object.keys(sheetResults).forEach(cls => {
     results[cls] = sheetResults[cls];
   });
-  // Firebase에서 삭제된 반은 로컬도 초기화
-  Object.keys(results).forEach(cls => {
-    const safeCls = cls.replace(/-/g, '__');
-    if(data && !data[safeCls]) {
-      results[cls] = {};
-    }
-  });
+  // Firebase에서 삭제된 반 로컬도 초기화
+  if(data) {
+    Object.keys(results).forEach(cls => {
+      const safeCls = cls.replace(/[.#$\[\]/]/g, '-');
+      if(!data[safeCls]) results[cls] = {};
+    });
+  }
   saveResults();
   renderResults();
   renderOverview();
