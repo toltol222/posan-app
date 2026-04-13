@@ -990,11 +990,12 @@ function syncToSheet(cls, key, studentData) {
   if(!cls || !key) return;
   const r = studentData || results[cls]?.[key] || {};
   if(!r.school && !r.custom && !r.pct) return;
-  const safeCls = cls.replace(/-/g, '_');
-  const safeKey = key.replace(/[.#$\[\]]/g, '_');
+  const safeCls = cls.replace(/-/g, '__');
+  const safeKey = encodeURIComponent(key).replace(/\./g, '%2E');
   db.ref(`results/${safeCls}/${safeKey}`).set({
     school: r.school||'', custom: r.custom||'',
     dept: r.dept||'', pct: r.pct||'',
+    cls: cls, key: key,
     updatedAt: new Date().toLocaleString('ko-KR')
   }).then(() => showSyncMsg('✓ 저장됐어요'))
     .catch(() => showSyncMsg('⚠ 저장 실패', true));
@@ -1002,35 +1003,53 @@ function syncToSheet(cls, key, studentData) {
 
 // 해당 반 전체 Firebase에서 삭제
 function clearClassData(cls) {
-  const safeCls = cls.replace(/-/g, '_');
+  const safeCls = cls.replace(/-/g, '__');
   db.ref(`results/${safeCls}`).remove()
     .then(() => showSyncMsg('✓ 초기화됐어요'))
     .catch(() => showSyncMsg('⚠ 초기화 실패', true));
 }
 
-// Firebase 실시간 리스너
-function startRealtimeSync() {
-  db.ref('results').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if(!data) return;
+// Firebase 데이터 → results 반영
+function applyFirebaseData(data) {
+  // 시트에 있는 반은 완전히 교체
+  const sheetResults = {};
+  if(data) {
     Object.entries(data).forEach(([safeCls, students]) => {
-      const cls = safeCls.replace(/_/g, '-');
-      if(!results[cls]) results[cls] = {};
       Object.entries(students).forEach(([safeKey, val]) => {
-        const key = safeKey.replace(/_/g, '-');
-        results[cls][key] = {
+        const cls = val.cls || safeCls.replace(/__/g, '-');
+        const key = val.key || decodeURIComponent(safeKey);
+        if(!sheetResults[cls]) sheetResults[cls] = {};
+        sheetResults[cls][key] = {
           school: val.school||'', custom: val.custom||'',
           dept: val.dept||'', pct: val.pct||'', cat:''
         };
       });
     });
-    saveResults();
-    renderResults();
-    renderOverview();
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
-    const el = document.getElementById('last-sync-time');
-    if(el) el.textContent = `마지막 갱신: ${timeStr}`;
+  }
+  // Firebase에 있는 반만 교체 (없는 반은 로컬 유지)
+  Object.keys(sheetResults).forEach(cls => {
+    results[cls] = sheetResults[cls];
+  });
+  // Firebase에서 삭제된 반은 로컬도 초기화
+  Object.keys(results).forEach(cls => {
+    const safeCls = cls.replace(/-/g, '__');
+    if(data && !data[safeCls]) {
+      results[cls] = {};
+    }
+  });
+  saveResults();
+  renderResults();
+  renderOverview();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+  const el = document.getElementById('last-sync-time');
+  if(el) el.textContent = `마지막 갱신: ${timeStr}`;
+}
+
+// Firebase 실시간 리스너
+function startRealtimeSync() {
+  db.ref('results').on('value', (snapshot) => {
+    applyFirebaseData(snapshot.val());
   });
 }
 
@@ -1040,26 +1059,8 @@ function manualLoad(btn) {
   btn.disabled = true;
   btn.style.opacity = '0.6';
   db.ref('results').get().then(snapshot => {
-    const data = snapshot.val();
-    if(data) {
-      Object.entries(data).forEach(([safeCls, students]) => {
-        const cls = safeCls.replace(/_/g, '-');
-        if(!results[cls]) results[cls] = {};
-        Object.entries(students).forEach(([safeKey, val]) => {
-          const key = safeKey.replace(/_/g, '-');
-          results[cls][key] = {
-            school: val.school||'', custom: val.custom||'',
-            dept: val.dept||'', pct: val.pct||'', cat:''
-          };
-        });
-      });
-      saveResults();
-      renderResults();
-      renderOverview();
-      showSyncMsg('✓ 최신 데이터를 불러왔어요');
-    } else {
-      showSyncMsg('데이터가 없어요');
-    }
+    applyFirebaseData(snapshot.val());
+    showSyncMsg(snapshot.val() ? '✓ 최신 데이터를 불러왔어요' : '데이터가 없어요');
   }).catch(() => showSyncMsg('⚠ 불러오기 실패', true))
     .finally(() => {
       btn.textContent = '↻ 지금 불러오기';
