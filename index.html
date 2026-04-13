@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포산중학교 고입 정보 시스템</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f3ee; --surface:#fff; --border:#e2ddd5; --border-dark:#ccc7be;
+  --text:#1a1814; --muted:#7a7670; --hint:#b0aba5;
+  --accent:#2d5a8e; --accent-light:#e8f0f9;
+  --success:#1a6b40; --success-bg:#e4f5ec;
+  --warning:#8a5200; --warning-bg:#fdf3e8;
+  --step-bg:#f8f7f4;
+  --tag-special:#f0eafa; --tag-special-t:#5b3d9e;
+  --tag-master:#e4f5ec; --tag-master-t:#1a6b40;
+  --tag-normal:#f0ede8; --tag-normal-t:#6b5e4e;
+  --tag-gifted:#fff4e0; --tag-gifted-t:#8a5a00;
+  --tag-auto:#e8f0f9; --tag-auto-t:#1e4a7a;
+  --tag-voca:#fceef0; --tag-voca-t:#8a2040;
+  --tag-jeon:#fdf3e8; --tag-jeon-t:#8a5200;
+  --tag-hu:#e8f5f0; --tag-hu-t:#1a6b50;
+  --r:10px; --rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:3rem 2.5rem;width:100%;max-width:380px}
+.login-box h1{font-family:'Noto Serif KR',serif;font-size:1.35rem;font-weight:600;margin-bottom:.35rem}
+.login-box .sub{font-size:.82rem;color:var(--muted);margin-bottom:2rem}
+.login-box label{display:block;font-size:.75rem;font-weight:500;color:var(--muted);margin-bottom:5px;letter-spacing:.06em;text-transform:uppercase}
+.login-box input{width:100%;padding:.65rem .9rem;border:1px solid var(--border);border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.95rem;background:var(--bg);color:var(--text);margin-bottom:1.1rem;outline:none;transition:border-color .2s}
+.login-box input:focus{border-color:var(--accent);background:#fff}
+.login-btn{width:100%;padding:.75rem;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:opacity .2s}
+.login-btn:hover{opacity:.88}
+.login-err{font-size:.82rem;color:#c0392b;margin-top:.8rem;text-align:center;display:none}
+
+/* ── APP ── */
+#app{display:none}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+header h1{font-family:'Noto Serif KR',serif;font-size:1.1rem;font-weight:600}
+.user-info{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted)}
+.logout-btn{font-size:.76rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 11px;cursor:pointer;transition:all .15s}
+.logout-btn:hover{background:var(--bg);color:var(--text)}
+
+/* ── NAV TABS ── */
+.nav-tabs{display:flex;gap:4px;padding:.75rem 2rem 0;background:var(--surface);border-bottom:1px solid var(--border)}
+.tab-btn{padding:.55rem 1.1rem;font-family:'Noto Sans KR',sans-serif;font-size:.86rem;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+.tab-btn:hover:not(.active){color:var(--text)}
+
+/* ── CONTAINER ── */
+.container{max-width:900px;margin:0 auto;padding:1.75rem 1.5rem}
+
+/* ── FILTERS ── */
+.filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1rem 1.25rem;margin-bottom:1.1rem;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters input[type=text]{flex:1;min-width:180px;padding:.48rem .8rem;border:1px solid var(--border);border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.87rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s}
+.filters input[type=text]:focus{border-color:var(--accent);background:#fff}
+.filters select{padding:.48rem .8rem;border:1px solid var(--border);border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.84rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
+.result-count{font-size:.79rem;color:var(--muted);margin-bottom:.85rem;padding-left:2px}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.2rem 1.4rem;margin-bottom:10px;transition:border-color .18s}
+.card:hover{border-color:var(--border-dark)}
+.card-title{font-size:1.02rem;font-weight:500;margin:6px 0 4px}
+.card-preview{font-size:.83rem;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badge{display:inline-block;font-size:.7rem;padding:3px 8px;border-radius:5px;margin-right:4px;margin-bottom:3px;font-weight:500}
+.b-special{background:var(--tag-special);color:var(--tag-special-t)}
+.b-master{background:var(--tag-master);color:var(--tag-master-t)}
+.b-normal{background:var(--tag-normal);color:var(--tag-normal-t)}
+.b-gifted{background:var(--tag-gifted);color:var(--tag-gifted-t)}
+.b-tasido{background:#e8f4e8;color:#2d6a2d}
+.b-auto{background:var(--tag-auto);color:var(--tag-auto-t)}
+.b-voca{background:var(--tag-voca);color:var(--tag-voca-t)}
+.b-jeon{background:var(--tag-jeon);color:var(--tag-jeon-t)}
+.b-hu{background:var(--tag-hu);color:var(--tag-hu-t)}
+.toggle-btn{font-size:.77rem;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;margin-top:9px;font-family:'Noto Sans KR',sans-serif}
+.toggle-btn:hover{text-decoration:underline}
+.card-detail{margin-top:15px;border-top:1px solid var(--border);padding-top:15px;display:none}
+.card-detail.open{display:block}
+.detail-section{margin-bottom:20px}
+.detail-section:last-child{margin-bottom:0}
+.detail-label{font-size:.78rem;font-weight:700;letter-spacing:.04em;color:var(--text);margin-bottom:10px;padding:6px 10px;background:var(--step-bg);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0}
+.feature-list{list-style:none;padding:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.feature-list li{font-size:.87rem;line-height:1.75;padding:8px 12px 8px 32px;border-bottom:1px solid var(--border);position:relative;background:var(--surface)}
+.feature-list li::before{content:'';position:absolute;left:13px;top:17px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.feature-list li:last-child{border-bottom:none}
+.admission-meta{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.admission-meta-row{display:flex;align-items:baseline;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:.87rem;line-height:1.7}
+.admission-meta-row:last-child{border-bottom:none}
+.admission-meta-label{flex-shrink:0;font-size:.72rem;font-weight:700;color:var(--muted);width:58px;padding-top:2px}
+.admission-meta-value{color:var(--text);flex:1}
+.admission-steps{background:var(--step-bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:8px}
+.admission-steps-title{font-size:.72rem;font-weight:700;color:var(--muted);padding:7px 12px 5px;border-bottom:1px solid var(--border)}
+.admission-step-item{display:flex;flex-direction:column;gap:3px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:.87rem;line-height:1.65}
+.admission-step-item:last-child{border-bottom:none}
+.admission-step-num{font-size:.75rem;font-weight:700;color:var(--accent)}
+.admission-step-text{color:var(--text);padding-left:2px}
+.admission-notes{margin-top:8px}
+.admission-note-item{font-size:.83rem;color:var(--muted);line-height:1.7;padding:3px 0 3px 12px;position:relative}
+.admission-note-item::before{content:'·';position:absolute;left:2px;color:var(--hint)}
+.result-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.result-table th{background:var(--step-bg);border:1px solid var(--border);padding:7px 11px;font-weight:500;font-size:.76rem;color:var(--muted);text-align:center}
+.result-table td{border:1px solid var(--border);padding:8px 11px;text-align:center;color:var(--text)}
+.result-table td.empty{color:var(--hint);font-size:.78rem;font-style:italic}
+.result-note{font-size:.77rem;color:var(--hint);margin-top:7px;line-height:1.6}
+
+/* ── RESULTS TAB ── */
+.class-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:10px}
+.class-header h2{font-size:1.1rem;font-weight:500}
+.class-meta{font-size:.82rem;color:var(--muted)}
+.student-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.student-table{width:100%;border-collapse:collapse;font-size:.87rem}
+.student-table th{background:var(--step-bg);border-bottom:1px solid var(--border);padding:10px 14px;font-weight:500;font-size:.78rem;color:var(--muted);text-align:left}
+.student-table td{border-bottom:1px solid var(--bg);padding:9px 14px;vertical-align:middle}
+.student-table tr:last-child td{border-bottom:none}
+.student-table tr:hover td{background:var(--bg)}
+.gender-m{color:#1e4a7a;font-size:.75rem;font-weight:500}
+.gender-f{color:#8a2040;font-size:.75rem;font-weight:500}
+.school-select{width:100%;padding:.38rem .6rem;border:1px solid var(--border);border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:.83rem;background:var(--bg);color:var(--text);outline:none}
+.school-select:focus{border-color:var(--accent)}
+.ac-wrap{position:relative;width:100%}
+.ac-input{width:100%;padding:.42rem .8rem;border:1px solid var(--border);border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:.86rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+.ac-input:focus{border-color:var(--accent);background:#fff}
+.ac-input::placeholder{color:var(--hint)}
+.ac-input.has-value{border-color:var(--success);background:var(--success-bg);font-weight:500;color:var(--success)}
+.ac-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:9px;box-shadow:0 4px 16px rgba(0,0,0,.08);z-index:200;max-height:220px;overflow-y:auto;display:none}
+.ac-dropdown.open{display:block}
+.ac-group-label{font-size:.7rem;font-weight:700;color:var(--hint);letter-spacing:.07em;text-transform:uppercase;padding:8px 12px 4px;border-top:1px solid var(--border)}
+.ac-group-label:first-child{border-top:none}
+.ac-item{padding:7px 14px;font-size:.86rem;cursor:pointer;transition:background .1s}
+.ac-item:hover,.ac-item.focused{background:var(--accent-light);color:var(--accent)}
+.ac-item mark{background:none;color:var(--accent);font-weight:700}
+.ac-empty{padding:12px 14px;font-size:.83rem;color:var(--hint);text-align:center}
+.school-input{width:100%;padding:.38rem .6rem;border:1px solid var(--border);border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:.83rem;background:var(--bg);color:var(--text);outline:none;margin-top:5px}
+.school-input:focus{border-color:var(--accent)}
+.school-input::placeholder{color:var(--hint)}
+.pct-wrap{display:flex;align-items:center;gap:4px}
+.pct-input{width:72px;padding:.42rem .55rem;border:1px solid var(--border);border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:.85rem;background:var(--bg);color:var(--text);outline:none;text-align:center}
+.pct-input:focus{border-color:var(--accent);background:#fff}
+.pct-unit{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.dept-select{width:100%;margin-top:5px;padding:.38rem .6rem;border:1px solid var(--accent);border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:.82rem;background:#f0f5fc;color:var(--text);outline:none;display:none}
+.dept-select.visible{display:block}
+.dept-select:focus{border-color:var(--accent)}
+.save-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-top:1px solid var(--border);background:var(--step-bg)}
+.save-btn{padding:.6rem 1.6rem;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:opacity .2s}
+.save-btn:hover{opacity:.88}
+.save-msg{font-size:.82rem;color:var(--success);display:none}
+.status-badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:500}
+.status-done{background:var(--success-bg);color:var(--success)}
+.status-none{background:var(--step-bg);color:var(--hint)}
+
+/* ── OVERVIEW TAB ── */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:1.5rem}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1rem 1.2rem;cursor:pointer;transition:border-color .18s}
+.ov-card:hover{border-color:var(--accent)}
+.ov-card h3{font-size:.95rem;font-weight:500;margin-bottom:4px}
+.ov-card .ov-teacher{font-size:.78rem;color:var(--muted);margin-bottom:8px}
+.ov-progress{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.ov-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.ov-count{font-size:.75rem;color:var(--muted)}
+.ov-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-top:1rem}
+.ov-detail-header{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ov-detail-header h3{font-size:1rem;font-weight:500}
+.close-btn{font-size:.8rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer}
+.close-btn:hover{background:var(--bg)}
+
+/* ── SETUP GUIDE ── */
+.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem 1.75rem;margin-bottom:1.2rem}
+.setup-box h3{font-size:1rem;font-weight:500;margin-bottom:.3rem}
+.setup-box p{font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.setup-input{width:100%;padding:.6rem .9rem;border:1px solid var(--border);border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.9rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s}
+.setup-input:focus{border-color:var(--accent);background:#fff}
+.setup-btn{margin-top:.75rem;padding:.6rem 1.4rem;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:opacity .2s}
+.setup-btn:hover{opacity:.88}
+.setup-status{font-size:.82rem;margin-top:.6rem}
+.setup-ok{color:var(--success)}
+.setup-err{color:#c0392b}
+.step-guide{display:flex;flex-direction:column;gap:10px;margin-top:1rem}
+.sg-item{display:flex;gap:12px;align-items:flex-start}
+.sg-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sg-text{font-size:.85rem;line-height:1.7;color:var(--text)}
+.sg-text code{background:var(--step-bg);padding:1px 6px;border-radius:4px;font-size:.83rem;font-family:monospace}
+.no-result{text-align:center;padding:4rem 2rem;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>포산중학교<br>고입 정보 시스템</h1>
+    <p class="sub">3학년 담당 선생님만 접근 가능합니다</p>
+    <label>이름</label>
+    <input type="text" id="inp-name" placeholder="성함을 입력하세요" autocomplete="off">
+    <label>비밀번호</label>
+    <input type="password" id="inp-pw" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-err" id="login-err">이름 또는 비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<!-- 앱 -->
+<div id="app">
+  <header>
+    <h1>포산중학교 고입 정보 시스템</h1>
+    <div class="user-info">
+      <span id="welcome-msg"></span>
+      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('schools',this)">학교 정보</button>
+    <button class="tab-btn" onclick="switchTab('results',this)">합격 입력</button>
+    <button class="tab-btn" onclick="switchTab('overview',this)">전체 현황</button>
+  </div>
+
+  <!-- 학교 정보 탭 -->
+  <div id="tab-schools" class="container">
+    <div class="filters">
+      <input type="text" id="search" placeholder="학교명 또는 키워드 검색..." oninput="renderSchools()">
+      <select id="filterType" onchange="renderSchools()">
+        <option value="">전체 구분</option>
+        <option value="일반고등학교">일반고</option>
+        <option value="선지원 일반고">선지원 일반고</option>
+        <option value="자율고">자율고</option>
+        <option value="영재학교">영재학교</option>
+        <option value="특수목적고등학교">특수목적고</option>
+        <option value="마이스터고">마이스터고</option>
+        <option value="특성화고">특성화고</option>
+        <option value="타시도 일반고">타시도 일반고</option>
+      </select>
+      <select id="filterTerm" onchange="renderSchools()">
+        <option value="">전기/후기</option>
+        <option value="전기">전기</option>
+        <option value="후기">후기</option>
+      </select>
+    </div>
+    <div class="result-count" id="school-count"></div>
+    <div id="school-list"></div>
+  </div>
+
+  <!-- 합격 입력 탭 -->
+  <div id="tab-results" class="container" style="display:none">
+    <div id="results-content"></div>
+  </div>
+
+  <!-- 전체 현황 탭 -->
+  <div id="tab-overview" class="container" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:.85rem;color:var(--muted)">모든 선생님의 입력 현황을 실시간으로 확인할 수 있어요</div>
+        <div id="last-sync-time" style="font-size:.78rem;color:var(--hint);margin-top:3px">마지막 갱신: —</div>
+      </div>
+      <button class="save-btn" style="font-size:.83rem;padding:.45rem 1.1rem" onclick="manualLoad(this)">↻ 지금 불러오기</button>
+    </div>
+    <div class="overview-grid" id="overview-grid"></div>
+    <div id="overview-detail"></div>
+  </div>
+
+
+</div>
+
+<script type="module">
+// ── 데이터 ──
+const USERS = {
+  "이선영":"301","박은진":"302","정지연":"303","이가혜":"304",
+  "장정원":"305","차경호":"306","최혜림":"307","이지은":"308",
+  "장경진":"309","이병호":"310","박정은":"311","박미정":"312"
+};
+
+const TEACHERS = {
+  "3-1":"이선영","3-2":"박은진","3-3":"정지연","3-4":"이가혜",
+  "3-5":"장정원","3-6":"차경호","3-7":"최혜림","3-8":"이지은",
+  "3-9":"장경진","3-10":"이병호","3-11":"박정은"
+};
+
+const CLASSES = {"3-1": [{"num": 1, "name": "김경민", "gender": "남"}, {"num": 2, "name": "김도연", "gender": "여"}, {"num": 3, "name": "김민경", "gender": "여"}, {"num": 4, "name": "김민균", "gender": "남"}, {"num": 5, "name": "김민정", "gender": "여"}, {"num": 6, "name": "김서연", "gender": "여"}, {"num": 7, "name": "김수아", "gender": "여"}, {"num": 8, "name": "김주하", "gender": "여"}, {"num": 9, "name": "김태훈", "gender": "남"}, {"num": 10, "name": "김하음", "gender": "여"}, {"num": 11, "name": "김현빈", "gender": "여"}, {"num": 12, "name": "남유준", "gender": "남"}, {"num": 13, "name": "박서윤", "gender": "여"}, {"num": 14, "name": "박성현", "gender": "남"}, {"num": 15, "name": "박종현", "gender": "남"}, {"num": 16, "name": "방동원", "gender": "남"}, {"num": 17, "name": "배준영", "gender": "남"}, {"num": 18, "name": "유창범", "gender": "남"}, {"num": 19, "name": "이지현", "gender": "여"}, {"num": 20, "name": "이채연", "gender": "여"}, {"num": 21, "name": "전현서", "gender": "남"}, {"num": 22, "name": "정예린", "gender": "여"}, {"num": 23, "name": "최민혁", "gender": "남"}, {"num": 24, "name": "홍아현", "gender": "여"}, {"num": 25, "name": "황다은", "gender": "여"}], "3-2": [{"num": 1, "name": "권하준", "gender": "남"}, {"num": 2, "name": "김기홍", "gender": "남"}, {"num": 3, "name": "김도현", "gender": "남"}, {"num": 4, "name": "김서연", "gender": "여"}, {"num": 5, "name": "김성현", "gender": "여"}, {"num": 6, "name": "김소원", "gender": "여"}, {"num": 7, "name": "김소정", "gender": "여"}, {"num": 8, "name": "김장현", "gender": "남"}, {"num": 9, "name": "김지훈", "gender": "남"}, {"num": 10, "name": "문성빈", "gender": "남"}, {"num": 11, "name": "박다율", "gender": "여"}, {"num": 12, "name": "박성민", "gender": "남"}, {"num": 13, "name": "배지효", "gender": "여"}, {"num": 14, "name": "신은비", "gender": "여"}, {"num": 15, "name": "양원서", "gender": "여"}, {"num": 16, "name": "이민정", "gender": "여"}, {"num": 17, "name": "이청경", "gender": "여"}, {"num": 18, "name": "정진온", "gender": "남"}, {"num": 19, "name": "조희민", "gender": "여"}, {"num": 20, "name": "최의찬", "gender": "남"}, {"num": 21, "name": "최지안", "gender": "여"}, {"num": 22, "name": "최진우", "gender": "남"}, {"num": 23, "name": "허승빈", "gender": "남"}, {"num": 24, "name": "황경원", "gender": "여"}], "3-3": [{"num": 1, "name": "권유민", "gender": "여"}, {"num": 2, "name": "김고은", "gender": "여"}, {"num": 3, "name": "김기범", "gender": "남"}, {"num": 4, "name": "김나영", "gender": "여"}, {"num": 5, "name": "김동훈", "gender": "남"}, {"num": 6, "name": "류태규", "gender": "남"}, {"num": 7, "name": "박서윤", "gender": "여"}, {"num": 8, "name": "박신영", "gender": "여"}, {"num": 9, "name": "박하정", "gender": "여"}, {"num": 10, "name": "백다혜", "gender": "여"}, {"num": 11, "name": "성나연", "gender": "여"}, {"num": 12, "name": "신가람", "gender": "남"}, {"num": 13, "name": "여선우", "gender": "남"}, {"num": 14, "name": "윤민준", "gender": "남"}, {"num": 15, "name": "이정원", "gender": "남"}, {"num": 16, "name": "이지윤", "gender": "여"}, {"num": 17, "name": "임정원", "gender": "남"}, {"num": 18, "name": "정미순", "gender": "여"}, {"num": 19, "name": "정민", "gender": "여"}, {"num": 20, "name": "조하윤", "gender": "남"}, {"num": 21, "name": "조하준", "gender": "남"}, {"num": 22, "name": "차승훈", "gender": "남"}, {"num": 23, "name": "허가엘", "gender": "여"}, {"num": 24, "name": "허라임", "gender": "여"}], "3-4": [{"num": 1, "name": "곽민주", "gender": "여"}, {"num": 2, "name": "김다솔", "gender": "여"}, {"num": 3, "name": "김다원", "gender": "여"}, {"num": 4, "name": "김승율", "gender": "남"}, {"num": 5, "name": "김시현", "gender": "남"}, {"num": 6, "name": "김지우", "gender": "여"}, {"num": 7, "name": "김현지", "gender": "여"}, {"num": 8, "name": "도하현", "gender": "여"}, {"num": 9, "name": "문재원", "gender": "남"}, {"num": 10, "name": "박건욱", "gender": "남"}, {"num": 11, "name": "박채은", "gender": "여"}, {"num": 12, "name": "신현서", "gender": "여"}, {"num": 13, "name": "안정담", "gender": "여"}, {"num": 14, "name": "오선우", "gender": "남"}, {"num": 15, "name": "윤가영", "gender": "여"}, {"num": 16, "name": "윤재윤", "gender": "남"}, {"num": 17, "name": "이연준", "gender": "남"}, {"num": 18, "name": "임영민", "gender": "남"}, {"num": 19, "name": "정세인", "gender": "여"}, {"num": 20, "name": "조수현", "gender": "여"}, {"num": 21, "name": "진청운", "gender": "남"}, {"num": 22, "name": "최민석", "gender": "남"}, {"num": 23, "name": "최우성", "gender": "남"}, {"num": 24, "name": "홍다연", "gender": "여"}], "3-5": [{"num": 1, "name": "강민재", "gender": "남"}, {"num": 2, "name": "강태우", "gender": "남"}, {"num": 3, "name": "김하은", "gender": "여"}, {"num": 4, "name": "김홍경", "gender": "여"}, {"num": 5, "name": "박도언", "gender": "남"}, {"num": 6, "name": "박도혜", "gender": "남"}, {"num": 7, "name": "박지연", "gender": "여"}, {"num": 8, "name": "백지예", "gender": "여"}, {"num": 9, "name": "서하율", "gender": "여"}, {"num": 10, "name": "안수아", "gender": "여"}, {"num": 11, "name": "안지성", "gender": "여"}, {"num": 12, "name": "윤가온", "gender": "여"}, {"num": 13, "name": "윤은서", "gender": "여"}, {"num": 14, "name": "이승용", "gender": "남"}, {"num": 15, "name": "이시연", "gender": "여"}, {"num": 16, "name": "이우진", "gender": "남"}, {"num": 17, "name": "이채원", "gender": "여"}, {"num": 18, "name": "이채윤", "gender": "여"}, {"num": 19, "name": "전유민", "gender": "남"}, {"num": 20, "name": "정우진", "gender": "남"}, {"num": 21, "name": "최승빈", "gender": "남"}, {"num": 22, "name": "한승우", "gender": "남"}, {"num": 23, "name": "홍태형", "gender": "남"}, {"num": 24, "name": "황지연", "gender": "여"}], "3-6": [{"num": 1, "name": "곽자민", "gender": "여"}, {"num": 2, "name": "김서연", "gender": "여"}, {"num": 3, "name": "김예훈", "gender": "남"}, {"num": 4, "name": "김현영", "gender": "여"}, {"num": 5, "name": "노가은", "gender": "여"}, {"num": 6, "name": "박대훈", "gender": "남"}, {"num": 7, "name": "박민경", "gender": "여"}, {"num": 8, "name": "박새봄", "gender": "여"}, {"num": 9, "name": "박시형", "gender": "남"}, {"num": 10, "name": "박지훈", "gender": "남"}, {"num": 11, "name": "박진우", "gender": "남"}, {"num": 12, "name": "방찬혁", "gender": "남"}, {"num": 13, "name": "성시윤", "gender": "남"}, {"num": 14, "name": "연지율", "gender": "여"}, {"num": 15, "name": "이나율", "gender": "여"}, {"num": 16, "name": "이나은", "gender": "여"}, {"num": 17, "name": "이승찬", "gender": "남"}, {"num": 18, "name": "이지성", "gender": "남"}, {"num": 19, "name": "이지아", "gender": "여"}, {"num": 20, "name": "이지우", "gender": "여"}, {"num": 21, "name": "이태림", "gender": "여"}, {"num": 22, "name": "전혜원", "gender": "여"}, {"num": 23, "name": "정상명", "gender": "남"}, {"num": 24, "name": "주성윤", "gender": "남"}], "3-7": [{"num": 1, "name": "곽도연", "gender": "여"}, {"num": 2, "name": "금동욱", "gender": "남"}, {"num": 3, "name": "김나연", "gender": "여"}, {"num": 4, "name": "김나은", "gender": "여"}, {"num": 5, "name": "김다현", "gender": "여"}, {"num": 6, "name": "김의영", "gender": "여"}, {"num": 7, "name": "김현서", "gender": "여"}, {"num": 8, "name": "문소윤", "gender": "여"}, {"num": 9, "name": "박정윤", "gender": "여"}, {"num": 10, "name": "박정환", "gender": "남"}, {"num": 11, "name": "박지우", "gender": "남"}, {"num": 12, "name": "윤수지", "gender": "여"}, {"num": 13, "name": "이경준", "gender": "남"}, {"num": 14, "name": "이다은", "gender": "여"}, {"num": 15, "name": "이도윤", "gender": "남"}, {"num": 16, "name": "이현유", "gender": "남"}, {"num": 17, "name": "장세용", "gender": "남"}, {"num": 18, "name": "전지현", "gender": "여"}, {"num": 19, "name": "최우혁", "gender": "남"}, {"num": 20, "name": "최은준", "gender": "남"}, {"num": 21, "name": "최희윤", "gender": "여"}, {"num": 22, "name": "한동헌", "gender": "남"}, {"num": 23, "name": "한승민", "gender": "남"}, {"num": 24, "name": "허다유", "gender": "여"}], "3-8": [{"num": 1, "name": "김나영", "gender": "여"}, {"num": 2, "name": "김도윤", "gender": "남"}, {"num": 3, "name": "김민건", "gender": "남"}, {"num": 4, "name": "김지현", "gender": "여"}, {"num": 5, "name": "문유민", "gender": "여"}, {"num": 6, "name": "박상현", "gender": "남"}, {"num": 7, "name": "박성혁", "gender": "남"}, {"num": 8, "name": "백지민", "gender": "여"}, {"num": 9, "name": "서성유", "gender": "여"}, {"num": 10, "name": "송지효", "gender": "여"}, {"num": 11, "name": "신은솔", "gender": "여"}, {"num": 12, "name": "우지훈", "gender": "남"}, {"num": 13, "name": "윤은비", "gender": "여"}, {"num": 14, "name": "이승혁", "gender": "남"}, {"num": 15, "name": "이예준", "gender": "남"}, {"num": 16, "name": "이은채", "gender": "여"}, {"num": 17, "name": "이지수", "gender": "남"}, {"num": 18, "name": "임은결", "gender": "남"}, {"num": 19, "name": "임은정", "gender": "여"}, {"num": 20, "name": "정예린", "gender": "여"}, {"num": 21, "name": "정율", "gender": "여"}, {"num": 22, "name": "조하은", "gender": "여"}, {"num": 23, "name": "최지호", "gender": "남"}, {"num": 24, "name": "홍지민", "gender": "남"}], "3-9": [{"num": 1, "name": "강경원", "gender": "남"}, {"num": 2, "name": "구민서", "gender": "남"}, {"num": 3, "name": "김보영", "gender": "여"}, {"num": 4, "name": "김시운", "gender": "남"}, {"num": 5, "name": "김윤종", "gender": "남"}, {"num": 6, "name": "김지유", "gender": "여"}, {"num": 7, "name": "김지윤", "gender": "여"}, {"num": 8, "name": "류은채", "gender": "여"}, {"num": 9, "name": "문해찬", "gender": "남"}, {"num": 10, "name": "배수빈", "gender": "남"}, {"num": 11, "name": "백다민", "gender": "여"}, {"num": 12, "name": "서채원", "gender": "여"}, {"num": 13, "name": "성준민", "gender": "남"}, {"num": 14, "name": "신기원", "gender": "남"}, {"num": 15, "name": "안정아", "gender": "여"}, {"num": 16, "name": "이하진", "gender": "남"}, {"num": 17, "name": "임민재", "gender": "남"}, {"num": 18, "name": "임현수", "gender": "남"}, {"num": 19, "name": "조유진", "gender": "여"}, {"num": 20, "name": "조현지", "gender": "여"}, {"num": 21, "name": "천다정", "gender": "여"}, {"num": 22, "name": "최지안", "gender": "여"}, {"num": 23, "name": "최지인", "gender": "여"}, {"num": 24, "name": "허지유", "gender": "여"}, {"num": 25, "name": "방유안", "gender": "남"}], "3-10": [{"num": 1, "name": "곽도윤", "gender": "여"}, {"num": 2, "name": "구도운", "gender": "남"}, {"num": 3, "name": "권지윤", "gender": "여"}, {"num": 4, "name": "기현진", "gender": "남"}, {"num": 5, "name": "김근후", "gender": "남"}, {"num": 6, "name": "김민지", "gender": "여"}, {"num": 7, "name": "김시율", "gender": "남"}, {"num": 8, "name": "김지오", "gender": "남"}, {"num": 9, "name": "김하린", "gender": "여"}, {"num": 10, "name": "류수민", "gender": "여"}, {"num": 11, "name": "안혜빈", "gender": "여"}, {"num": 12, "name": "이선우", "gender": "남"}, {"num": 13, "name": "이소윤", "gender": "여"}, {"num": 14, "name": "이준희", "gender": "여"}, {"num": 15, "name": "임나원", "gender": "여"}, {"num": 16, "name": "임현민", "gender": "남"}, {"num": 17, "name": "장여원", "gender": "여"}, {"num": 18, "name": "전현서", "gender": "남"}, {"num": 19, "name": "정세은", "gender": "여"}, {"num": 20, "name": "진민후", "gender": "남"}, {"num": 21, "name": "채성오", "gender": "남"}, {"num": 22, "name": "최경훈", "gender": "남"}, {"num": 23, "name": "최민석", "gender": "남"}, {"num": 24, "name": "최정원", "gender": "여"}], "3-11": [{"num": 1, "name": "김건우", "gender": "남"}, {"num": 2, "name": "김나영", "gender": "여"}, {"num": 3, "name": "김도윤", "gender": "남"}, {"num": 4, "name": "김민서", "gender": "여"}, {"num": 5, "name": "김서윤", "gender": "여"}, {"num": 6, "name": "김시윤", "gender": "남"}, {"num": 7, "name": "김은별", "gender": "여"}, {"num": 8, "name": "김진현", "gender": "남"}, {"num": 9, "name": "박진회", "gender": "여"}, {"num": 10, "name": "변지유", "gender": "남"}, {"num": 11, "name": "석무성", "gender": "남"}, {"num": 12, "name": "성다은", "gender": "여"}, {"num": 13, "name": "손은채", "gender": "여"}, {"num": 14, "name": "신유선", "gender": "여"}, {"num": 15, "name": "양태훈", "gender": "남"}, {"num": 16, "name": "윤소인", "gender": "여"}, {"num": 17, "name": "이규빈", "gender": "여"}, {"num": 18, "name": "이민서", "gender": "여"}, {"num": 19, "name": "이시윤", "gender": "남"}, {"num": 20, "name": "이현진", "gender": "여"}, {"num": 21, "name": "주혜령", "gender": "여"}, {"num": 22, "name": "최희락", "gender": "남"}, {"num": 23, "name": "현규환", "gender": "남"}, {"num": 24, "name": "황예영", "gender": "여"}]}
+
+
+
+const SCHOOLS = [
+  {term:"후기",type:"일반고등학교",name:"추첨배정 일반고",
+   feature:"추첨배정 방식으로 선발. 총 65개교 (1학군 34교, 2학군 31교).|배정 방법|IB 운영 학교(경북대사대부고·대구서부고·포산고) 및 교과 중점 학교 희망자는 우선 지원 가능\n1단계 추첨배정: 대구 전 지역(단일학군)에서 희망학교 2개교에 지원, 각 학교 모집정원의 50% 배정\n2단계 추첨배정: 거주지 일반학군(1·2학군) 내 희망학교 2개교에 지원, 각 학교 모집정원의 10% 배정\n3단계 지리정보 배정: 미배정 학생을 거주지 기준 통학시간을 고려해 GIS로 배정|1학군 (34교) — 중구·수성구·동구·북구|경북대사대부고, 경북여고, 경북고, 대구여고, 동문고, 수성고, 시지고, 경신고, 능인고, 대구남산고, 대구혜화여고, 대륜고, 덕원고, 오성고, 정화여고, 강동고, 대구동부고, 영신고, 정동고, 청구고, 구암고, 매천고, 운암고, 칠성고, 학남고, 함지고, 강북고, 경명여고, 경상고, 경상여고, 성광고, 성화여고, 영송여고, 영진고|2학군 (31교) — 서구·남구·달서구·달성군|신명고, 경덕여고, 달성고, 대구서부고, 대구제일고, 대구고, 경일여고, 협성고, 대곡고, 대건고, 대구상원고, 대진고, 도원고, 상인고, 성산고, 성서고, 와룡고, 호산고, 경원고, 경화여고, 송현여고, 영남고, 원화여고, 효성여고, 다사고, 비슬고, 포산고, 화원고, 대원고, 심인고, 현풍고",
+   note:"",admission:"",
+   cutline:[
+     {year:"2021", score:"77.5%"},
+     {year:"2022", score:"84%"},
+     {year:"2023", score:"80%"},
+     {year:"2024", score:"100%"},
+     {year:"2025", score:"88.278%"}
+   ]},
+  {term:"후기",type:"선지원 일반고",name:"달서고",feature:"",note:"",admission:""},
+  {term:"후기",type:"선지원 일반고",name:"대구중앙고",feature:"",note:"",admission:""},
+  {term:"후기",type:"선지원 일반고",name:"군위고",feature:"",note:"",admission:""},
+  {term:"후기",type:"자율고",name:"계성고",feature:"",note:"",admission:""},
+  {term:"전기",type:"영재학교",name:"대구과학고",
+   feature:"1988년 개교 후 2011년 과학영재학교로 전환된 전국 단위 모집 공립 영재학교.\n수학·과학 분야 심화 및 R&E(연구활동), 탐구과제 등 연구 중심 교육과정 운영.\n학생 전원 기숙사 생활. 2주 간격 입·퇴사(일요일 입사, 금요일 퇴사).\n전국에서 지원 가능하며 수도권 출신 학생 비율이 높음. 대구 출신 학생 우선선발 제도 운영.\n※ 의·치·한·수·약학 계열 진학 희망자는 진학에 부적합. 해당 계열 진학 시 3학년 생활기록부(세특 전체) 삭제 및 교육비·장학금 환수.",
+   note:"전국 단위 모집 | 공립 | 기숙사 전원",
+   admission:"모집인원: 120명 내외(일반전형 90명 내외, 정원 외 8명 이내)\n지원자격: 중학교 재학생·졸업생 중 수학·과학 분야 뛰어난 재능과 잠재력이 있다고 인정되어 학교장·지도교원·담임교원의 추천을 받은 자\n전형방법: 입학담당관 중심 과학영재 전형\n- 1단계 (서류 평가): 학생기록물 평가 — 자기소개서, 교사추천서, 학교생활기록부 등 서류 종합 평가\n- 2단계 (창의적문제해결력 평가): 수학·과학 분야 창의적 문제해결력 지필평가 (7월 중 시행)\n- 3단계 (영재성 다면평가): 캠프 형식, 수·과학 탐구활동, 팀별 토론·실험, 인성 등 종합 평가 (8월 중 시행)\n※ 영재학교 간 중복 지원 불가. 불참 시 불합격 처리."},
+  {term:"전기",type:"특수목적고등학교",name:"대구일과학고",
+   feature:"대구광역시 동구 각산동 소재 공립 과학고등학교. 2011년 개교.\n수학·과학 분야 심화 교육과정 운영. 탐구과제 연구(R&E), 해외 이공계 탐방, ISEF(국제과학경진대회) 출전 경력 보유.\n학생 전원 기숙사 생활 원칙(벌점 40점 시 영구 퇴사).\n경북대학교, DGIST와 업무협약(MOU) 체결 — 연구 시설·인프라 연계 활용.\n※ 의예·치의예·한의예·수의예·약학 계열 진학 희망자에게 적합하지 않음. 입학 시 동의서 작성 필수. 위반 시 징계 및 졸업 유예, 교육비 환수 조치.",
+   note:"대구·타지역 지원 가능 | 공립 | 기숙사 전원",
+   admission:"지원자격: 중학교 졸업예정자 또는 졸업자로 수학·과학 분야 영재성이 있는 자\n인터넷 접수 후 제출 서류(입학원서, 자기소개서, 교사추천서, 학교생활기록부)를 우편 또는 방문 제출\n- 1단계 (서류 평가 및 출석 면담): 제출 서류 신뢰도 검증을 위해 지원자 전원 출석 면담 진행. 학업성취도·자기주도 학습능력·탐구능력 종합 평가\n- 2단계 (면접 평가): 1단계 통과자 소집. 창의성·잠재력·자기주도 학습역량·인성 등을 평가하는 면접 실시\n자기주도학습전형 100% 선발. 영재학교 간 중복 지원 불가.",
+   cutline:[{year:"2025", score:"1.465%"}]},
+  {term:"전기",type:"특수목적고등학교",name:"대구외국어고",
+   feature:"대구광역시 달서구 소재 공립 외국어고등학교.\n단일 학과인 영어과(6개 학급)로 개편. 모든 학생이 전공어로 영어를 이수하고, 중국어·일본어·프랑스어·스페인어 중 1개를 부전공으로 선택하여 학습.\n전교생 기숙사 생활 원칙.\n대구·외국어고 없는 타 시도 학생 지원 가능.",
+   note:"대구 및 외고 없는 타지역 지원 가능 | 공립 | 기숙사 전원",
+   admission:"모집인원: 남녀공학 총 120명 (일반 96명, 사회통합 24명)\n인터넷 원서 접수 및 자기소개서 입력 후 학교 지정 장소에 서류 인편 제출\n자기주도학습전형으로 선발\n- 1단계 (1.5배수 선발): 2~3학년 4개 학기 영어 내신 성적(160점 만점) + 출결 감점 반영\n- 2단계 (면접): 1단계 성적(160점) + 면접(40점) 합산하여 최종 선발\n- 면접: 자기주도학습 영역(꿈과 끼 영역) + 인성 영역 중심 평가\n※ 자기소개서에 어학인증시험 점수, 교내외 대회 입상 실적, 영재교육원 수료 여부, 부모의 사회·경제적 지위를 암시하는 내용 기재 시 해당 항목 0점 처리 또는 감점\n※ 다른 외국어고·국제고·자율형 사립고에 이중 지원 불가. 적발 시 합격 취소."},
+  {term:"전기",type:"특수목적고등학교",name:"대구국제고",
+   feature:"2022년 개교한 대구 최초의 국제고. 대구광역시 소재 공립 국제고등학교.\n영어 외에도 중국어·베트남어·러시아어 등 다양한 외국어를 깊이 있게 학습. 경제 수학·융합 과학·정보 등 융합·환경·IT 과목을 통한 미래역량 함양 강조.\n전교생 크롬북 무상 대여. 전교생 기숙사 생활(주말·공휴일 제외).\n2025학년도부터 대구 외 타 시도(국제고 없는 지역) 학생도 지원 가능.\n학교 교포: 매년 12월 말 'DHI 심포지온' 학술제 개최.",
+   note:"대구 및 국제고 없는 타지역 지원 가능 | 공립 | 기숙사 | 2022년 개교",
+   admission:"모집인원: 남녀공학 6학급 총 120명 (일반 96명, 사회통합 24명)\n온라인 원서 접수 후 학교 원서접수센터 방문 서류 제출\n자기주도학습전형으로 선발\n- 1단계 (1.5배수 선발): 영어 내신 성적 + 출결 감점 합산(160점 만점)\n- 2단계 (면접): 1단계 점수(160점) + 면접(40점) 합산하여 최종 합격자 선발\n- 면접: 개별 구술 면접. 자기주도학습 영역(학습 과정, 지원동기 및 진로계획) + 인성 영역(핵심인성요소에 대한 중학교 활동 실적 및 느낀 점) 종합 평가\n※ 자기소개서에 어학인증시험 점수, 교내외 대회 입상 실적 등 기재 시 감점 또는 0점 처리\n※ 다른 외국어고·국제고·자율형 사립고에 이중 지원 불가. 적발 시 합격 취소.",
+   cutline:[{year:"2025", score:"4.029%"}]},
+  {term:"전기",type:"특수목적고등학교",name:"대구체육고",
+   feature:"전국 단위 모집. 육상·수영·체조·축구·배구·농구·야구·소프트볼·유도·씨름·태권도·복싱·역도·사이클 등 14개 종목 운영.\n학비는 일반고 수준이지만 면제 범위가 넓음.\n스포츠개론 등 기초 이론과 종목별 실기 중심의 전문 교과로 구성.",
+   note:"전국 단위 모집 | 공립",
+   admission:"학교 행정실에 직접 원서 접수하거나 우편 제출\n전형 요소 배점:\n- 내신 성적 40%\n- 기초체력검사 10%\n- 전문기능검사(종목별 실기) 20%\n- 입상실적 10%\n- 면접 20%"},
+  {term:"전기",type:"특수목적고등학교",name:"경북예술고",
+   feature:"전국 단위 모집. 음악과·미술과·무용과·뮤지컬연기과 4개 학과 운영.\n모든 학과에서 전공별로 깊이 있는 필기 및 실기 전문 교과를 학습. 기숙사 운영.",
+   note:"전국 단위 모집 | 공립 | 기숙사",
+   admission:"인터넷 원서 접수 후 서류를 방문 또는 등기우편으로 제출\n- 우선 선발 전형 (미술과 내신 우수자): 실기고사 없이 면접만으로 선발\n- 일반 전형: 중학교 내신 성적(40%) + 전공별 실기 성적(60%) 합산하여 선발",
+   cutline:[
+     {year:"실용무용과", score:"61.538%"},
+     {year:"미술과",     score:"68.498%"}
+   ]},
+  {term:"전기",type:"마이스터고",name:"경북기계공업고등학교",
+   feature:"대구광역시 동구 소재 공립 마이스터고. 기계·메카트로닉스 계열 특화.\n학과: 정밀기계과, 자동화설비과, 전기전자제어과.\n졸업 후 관련 산업체 취업 연계 및 직업 능력 향상 지원.",
+   note:"공립 | 마이스터고",
+   admission:"인터넷 원서 접수 후 접수 마감 시간 이내에 관련 서류를 인편 또는 우편으로 제출\n- 1단계 (서류 전형): 교과 성적·출결 등을 바탕으로 모집 정원의 1.5배수 선발\n- 2단계 (심층 면접): 직업기초능력(직무적성)을 묻는 지필 또는 CBT 평가 + 인성 및 성장 가능성을 평가하는 구술 심층 면접\n- 입학 후 원활한 실습 및 취업을 위해 신체검사(또는 전문의 소견서) 제출",
+   cutline:[{year:"2025", score:"80.22%"}]},
+  {term:"전기",type:"마이스터고",name:"대구소프트웨어마이스터고등학교",
+   feature:"대구광역시 달성군 구지면 소재 공립 SW 마이스터고. 2016년 개교.\n학과: 소프트웨어개발과, 인공지능소프트웨어과.\n웹 프론트엔드 및 백엔드 프로그래밍 중심 교육. 학생 전원 기숙사 입소 의무.\n세상을 이롭게 하는 소프트웨어 개발자 양성을 모토로 함.",
+   note:"전국 단위 모집 가능 | 공립 | 기숙사 전원",
+   admission:"인터넷 원서 접수 후 접수 마감 시간 이내에 관련 서류를 인편 또는 우편으로 제출\n- 1단계 (서류 전형): 교과 성적·출결 등을 바탕으로 모집 정원의 1.5배수 선발\n- 2단계 (심층 면접): 직업기초능력(직무적성) 지필/CBT 평가 + 학업 역량과 직무 역량을 묻는 개인/집단 면접\n- 입학 후 원활한 실습 및 취업을 위해 신체검사(또는 전문의 소견서) 제출",
+   cutline:[{year:"2025", score:"23.077%"}]},
+  {term:"전기",type:"마이스터고",name:"대구농업마이스터고등학교",
+   feature:"대구광역시 수성구 소재 공립 농업 마이스터고. 1910년 개교(대구공립농림학교), 2017년 마이스터고 전환.\n학과: 스마트농생명과, 도시공간조경과, 그린바이오산업과.\n도시형 첨단농업경영 관련 기술 인재 양성. 학교농장 등 실습 시설 보유.",
+   note:"공립 | 마이스터고 | 1910년 설립",
+   admission:"인터넷 원서 접수 후 접수 마감 시간 이내에 관련 서류를 인편 또는 우편으로 제출\n- 1단계 (서류 전형): 교과 성적·출결 등을 바탕으로 모집 정원의 1.5배수 선발\n- 2단계 (심층 면접): 직업기초능력(직무적성) 지필/CBT 평가 + 구술 심층 면접\n- 입학 후 원활한 실습 및 취업을 위해 신체검사(또는 전문의 소견서) 제출",
+   cutline:[{year:"2025", score:"88.645%"}]},
+  {term:"전기",type:"마이스터고",name:"대구일마이스터고등학교",
+   feature:"대구광역시 동구 소재 공립 자동차 산업 마이스터고.\n학과: 정밀기계가공과, 금형설계제작과, 생산자동화과.\n자동차 산업 계열 특화. 졸업과 동시에 육군 전문기술병 임관이 가능한 군특성화 과정 운영.\n학생 전원 기숙사 생활. 아침 6시~7시 태권도 수련 진행.\n독일 베를린 바텐팔과 교환학생 프로그램 운영(3학년 3개월, 2학년 3주).",
+   note:"공립 | 기숙사 전원 | 독일 교환학생 프로그램",
+   admission:"인터넷 원서 접수 후 접수 마감 시간 이내에 관련 서류를 인편 또는 우편으로 제출\n- 1단계 (서류 전형): 교과 성적·출결 등을 바탕으로 모집 정원의 1.5배수 선발\n- 2단계 (심층 면접): 직업기초능력(직무적성) 지필/CBT 평가 + 구술 심층 면접\n- 입학 후 원활한 실습 및 취업을 위해 신체검사(또는 전문의 소견서) 제출"},
+  {term:"전기",type:"마이스터고",name:"대구반도체마이스터고등학교",
+   feature:"대구광역시 달서구 용산로 소재 공립 반도체 마이스터고.\n학과: 반도체장비과, 반도체소자과.\n반도체 제조 설비 및 장비 관련 전문 인력 양성. 경북대학교 및 DGIST와 연계하여 실제 반도체 소자 제작 실무 역량 강화 교육 진행.\n인공지능을 활용한 AI역량검사를 전형에 포함.",
+   note:"공립 | 반도체 특화 | AI역량검사 시행",
+   admission:"인터넷 원서 접수 후 접수 마감 시간 이내에 관련 서류를 인편 또는 우편으로 제출\n- 1단계 (서류 전형): 교과 성적·출결 등을 바탕으로 모집 정원의 1.5배수 선발\n- 2단계 (심층 면접): 직업기초능력(직무적성) 지필/CBT 평가 + AI역량검사 + 구술 심층 면접\n- 입학 후 원활한 실습 및 취업을 위해 신체검사(또는 전문의 소견서) 제출"},
+  // 타시도 마이스터고
+  {term:"전기",type:"마이스터고",name:"구미전자공고",
+   feature:"경북 구미 소재 마이스터고.",note:"경북 구미 | 마이스터고",admission:"",
+   cutline:[{year:"2025", score:"49.451%"}]},
+  {term:"전기",type:"마이스터고",name:"경주한국반도체마이스터고",
+   feature:"경북 경주 소재 마이스터고.",note:"경북 경주 | 마이스터고",admission:"",
+   cutline:[{year:"2025", score:"59.341%"}]},
+  {term:"전기",type:"마이스터고",name:"진주공군항공과학고",
+   feature:"경남 진주 소재 마이스터고.",note:"경남 진주 | 마이스터고",admission:"",
+   cutline:[{year:"2025", score:"17.216%"}]},
+  {term:"전기",type:"특성화고",name:"대구공고(남)",feature:"자동화기계, 친환경자동차, 스마트공간 등 기초 산업부터 첨단 산업까지 포괄하는 공업 인재를 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원(대구 소재 중학교), 타 지역은 직접 지원.\n- 취업희망자 전형(70% 이내): 서류전형 + 심층 면접\n- 일반 전형: 중학교 내신 성적(석차백분율) 순위에 따라 선발."},
+  {term:"전기",type:"특성화고",name:"대구공고텍폴캠(남녀)",feature:"AI모빌리티과와 조리제과제빵과를 운영. 전교생에게 매년 교육 장학금 지급.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"AI모빌리티과", general:"84.249%", employ:"82.418%"}
+   ]},
+  {term:"전기",type:"특성화고",name:"대구하이텍고(남녀)",feature:"스마트메카닉스, 스마트테크, IT전자 등 4차 산업혁명을 이끌어갈 첨단 설계 및 기술인을 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"IT전자과",        general:"91.209%", employ:"91.575%"},
+     {dept:"스마트테크과",    general:"94.505%", employ:"94.139%"},
+     {dept:"스마트메카닉스과",general:"90.842%", employ:"93.04%"}
+   ]},
+  {term:"전기",type:"특성화고",name:"대구과학기술고(남녀)",feature:"스마트팩토리, 소재설계가공, 아트조리 등 미래 산업 변화에 능동적으로 대처하는 융합 인력을 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"자동화시스템과", general:"97.070%", employ:"—"}
+   ]},
+  {term:"전기",type:"특성화고",name:"대구제일여상고",feature:"경영·금융계열과 콘텐츠 마케팅과를 통해 실무에 강한 비즈니스 및 판매유통 전문가를 육성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"특성화고",name:"경북공고(남녀)",feature:"건축그래픽, 전자기계, 다이텍소재, 반도체화공 등 다양한 분야의 공업 기술인을 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"특성화고",name:"영남공고",feature:"M-로보틱스, 데이터·SW, 전동제어 등 차세대 모빌리티 부품 및 첨단 소재 관련 인재를 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"M-로보틱스과", general:"91.941% (일반계 탈락 후 원서접수)", employ:"—"}
+   ]},
+  {term:"전기",type:"특성화고",name:"경상공고(남)",feature:"스마트모빌리티, 전자기계, 전기전자, 건설공간정보 등 실무 중심의 기술 인력 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"전자기계과", general:"99.267%", employ:"—"},
+     {dept:"기타학과(일반계 탈락 후)", general:"99.634%", employ:"—"}
+   ]},
+  {term:"전기",type:"특성화고",name:"조일고(남녀)",feature:"공군부사관, 항공기계, 소방안전 등을 신설하여 중간 간부 양성 및 특수 안전, 기술 분야 전문인을 육성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"특성화고",name:"대중금속공고(남녀)",feature:"정밀기계, 자동화기계, 소프트웨어 분야 교육. 대구 직업교육 특성화고 중 유일하게 전국 단위로 신입생을 모집.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"특성화고",name:"대명고(대구여상)",feature:"AI융합비즈니스, 디지털마케팅, 펫서비스, 콘텐츠크리에이터 등 최신 트렌드를 반영한 학과를 운영.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"반려동물케어과",  general:"89.744%", employ:"—"},
+     {dept:"콘텐츠미디어과", general:"98.901% (일반계 탈락 후 원서접수)", employ:"—"}
+   ]},
+  {term:"전기",type:"특성화고",name:"경북여상고",feature:"상업정보계열 외에도 3D융합콘텐츠, 보건행정 코디네이터 전문 인력을 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"특성화고",name:"대구보건고(여)",feature:"보건간호, 치의보건간호 및 반려동물케어과를 두어 의료보조 인력 및 수의 보조 인력을 양성.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"펫서비스과", general:"84.615%", employ:"—"}
+   ]},
+  {term:"전기",type:"특성화고",name:"상서고(남녀, 뷰티는 여)",feature:"연예매니지먼트, 제과제빵, 조리, 뷰티디자인 등 엔터테인먼트 및 외식·미용 산업 특화 학교.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨.",
+   deptCutline:[
+     {dept:"뷰티디자인과", general:"93.407%", employ:"—"},
+     {dept:"제과제빵과",   general:"—",       employ:"86.081%"}
+   ]},
+  {term:"전기",type:"특성화고",name:"대구관광고(남녀)",feature:"관광호텔, 관광조리, 웹툰일러스트디자인, 뷰티코디네이션 등 관광 서비스 및 융합 미디어 전문 교육.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"특성화고",name:"달구벌고(남녀)",feature:"직업교육이 아닌 대안교육 특성화고등학교. 도보 및 자전거 여행, 뮤지컬 캠프 등 대안 교과를 운영.",note:"",admission:"NEIS 시스템을 통해 일괄 지원.\n- 취업희망자 전형 + 일반 전형으로 나뉨."},
+  {term:"전기",type:"각종학교",name:"대구해올고등학교",
+   feature:"대구광역시 달서구 소재 공립 대안고등학교.",
+   note:"공립 | 대안교육 | 각종학교",admission:"",
+   cutline:[{year:"2025", score:"89.011%"}]},
+  // 타시도 일반고
+  {term:"전기",type:"타시도 일반고",name:"창녕고",
+   feature:"경남 창녕군 소재. 사립. 남학교. 인문계 일반고. 전국단위 모집.\n학년당 2학급 50명. 축구부가 전교생의 약 1/3이라 비체육계 학생은 내신 받기 유리.\n기숙사 있음 (4인 1실).\n인성(출결)을 가장 먼저 봄.\n포산중 작년 2명 진학.\n대구 인문계 원서는 쓰지 않고 지원해야 함.\n⚠ 2025년에 합격 확답 후 탈락 사태 발생. 학교 약속 신뢰도 이슈 있음.",
+   note:"경남 창녕 | 사립 | 남학교 | 전국단위 | 기숙사 | 대구 인문계 원서 미제출 필수",
+   admission:"",
+   cutline:[{year:"2025", score:"90.476% (성적보다 인성 중점)"}]},
+  {term:"전기",type:"타시도 일반고",name:"창녕대성고",
+   feature:"경남 창녕군 소재. 사립. 남녀공학. 인문계 일반고. 전국단위 모집.\n학년당 2학급 40명 (남녀 각 20명, 성비 5:5). 기숙사 100% (전원 입소).\n주로 대구·창녕 등 근교 학생 다수 지원.\n내신 경쟁이 덜해 상위권 내신 받기 유리하다는 장점.\n2025년 기준 인기가 높아져 80%대 학생들 다 불합격.\n대구 인문계 원서는 쓰지 않고 지원해야 함.",
+   note:"경남 창녕 | 사립 | 남녀공학 | 전국단위 | 기숙사 100% | 대구 인문계 원서 미제출 필수",
+   admission:"",
+   cutline:[{year:"2025", score:"67.766%"}]},
+  {term:"전기",type:"타시도 일반고",name:"창녕옥야고",
+   feature:"경남 창녕군 소재. 공립. 남녀공학. 전국단위 모집 자율학교.\n모집인원: 전국 84명 + 창녕지역 12명 = 총 96명.\n공부 잘하는 상위권 학생들이 가는 곳으로 알려짐. 수능·학종·논술에 강한 학교.\n1인 1지정 좌석 스터디카페(자기주도학습실) 운영.\nDGIST(대구경북과학기술원)와 R&D 연계 프로그램 운영.\n야간 수학 심화 특강(외부 강사), 주 1회 수리논술 전문 특강(240분) 운영.\n고교학점제 준비학교 — 차별화된 교육과정 운영.",
+   note:"경남 창녕 | 공립 | 남녀공학 | 전국단위 | 수능·학종·논술 강점",
+   admission:"",
+   cutline:[{year:"2025", score:"0.733% (상위권 학생들만 받음)"}]},
+  {term:"전기",type:"타시도 일반고",name:"창녕여고",
+   feature:"경남 창녕군 소재. 공립. 여학교. 교육부·경상남도교육청 지정 전국단위 모집 자율학교.\n학과: 보통과(3학급 72명, 대학진학) + 보건간호과(2학급 40명, 취업 및 대학진학).\n기숙사: 희망 학생 전원 입소 가능.\n성적보다 인성(출결)을 중점으로 봄.\n미달이라서 계속 전화왔었음. 올해는 어떻게 될지 모름.",
+   note:"경남 창녕 | 공립 | 여학교 | 전국단위 | 기숙사 희망자 전원",
+   admission:"",
+   cutline:[{year:"2025", score:"100%"}]}
+];
+
+// 학교 선택 드롭다운 그룹 구조
+const SCHOOL_GROUPS = [
+  {
+    label: "일반고 — 1학군 (34교)",
+    schools: ["경북대사대부고","경북여고","경북고","대구여고","동문고","수성고","시지고","경신고","능인고","대구남산고","대구혜화여고","대륜고","덕원고","오성고","정화여고","강동고","대구동부고","영신고","정동고","청구고","구암고","매천고","운암고","칠성고","학남고","함지고","강북고","경명여고","경상고","경상여고","성광고","성화여고","영송여고","영진고"]
+  },
+  {
+    label: "일반고 — 2학군 (31교)",
+    schools: ["신명고","경덕여고","달성고","대구서부고","대구제일고","대구고","경일여고","협성고","대곡고","대건고","대구상원고","대진고","도원고","상인고","성산고","성서고","와룡고","호산고","경원고","경화여고","송현여고","영남고","원화여고","효성여고","다사고","비슬고","포산고","화원고","대원고","심인고","현풍고"]
+  },
+  {
+    label: "선지원 일반고 · 자율고",
+    schools: ["추첨배정 일반고","대구중앙고","달서고","군위고","계성고"]
+  },
+  {
+    label: "영재학교",
+    schools: ["대구과학고"]
+  },
+  {
+    label: "특수목적고",
+    schools: ["대구일과학고","대구외국어고","대구국제고","대구체육고","경북예술고"]
+  },
+  {
+    label: "마이스터고",
+    schools: ["경북기계공업고등학교","대구소프트웨어마이스터고등학교","대구농업마이스터고등학교","대구일마이스터고등학교","대구반도체마이스터고등학교","구미전자공고","경주한국반도체마이스터고","진주공군항공과학고"]
+  },
+  {
+    label: "특성화고",
+    schools: ["대구공고(남)","대구공고텍폴캠(남녀)","대구하이텍고(남녀)","대구과학기술고(남녀)","대구제일여상고","경북공고(남녀)","영남공고","경상공고(남)","조일고(남녀)","대중금속공고(남녀)","대명고(대구여상)","경북여상고","대구보건고(여)","상서고(남녀, 뷰티는 여)","대구관광고(남녀)","달구벌고(남녀)"]
+  },
+  {
+    label: "타시도 일반고",
+    schools: ["창녕고","창녕대성고","창녕옥야고","창녕여고"]
+  }
+];
+
+// ── 특성화고 학과 데이터 ──
+const SCHOOL_DEPTS = {
+  "대구공고(남)": ["자동화기계과","친환경자동차과","스마트공간과"],
+  "대구공고텍폴캠(남녀)": ["AI모빌리티과","조리제과제빵과"],
+  "대구하이텍고(남녀)": ["스마트메카닉스과","스마트테크과","IT전자과"],
+  "대구과학기술고(남녀)": ["스마트팩토리과","소재설계가공과","아트조리과"],
+  "대구제일여상고": ["경영금융과","콘텐츠마케팅과"],
+  "경북공고(남녀)": ["건축그래픽과","전자기계과","다이텍소재과","반도체화공과"],
+  "영남공고": ["M-로보틱스과","데이터SW과","전동제어과"],
+  "경상공고(남)": ["스마트모빌리티과","전자기계과","전기전자과","건설공간정보과"],
+  "조일고(남녀)": ["공군부사관과","항공기계과","소방안전과"],
+  "대중금속공고(남녀)": ["정밀기계과","자동화기계과","소프트웨어과"],
+  "대명고(대구여상)": ["AI융합비즈니스과","디지털마케팅과","펫서비스과","콘텐츠크리에이터과"],
+  "경북여상고": ["상업정보과","3D융합콘텐츠과","보건행정코디네이터과"],
+  "대구보건고(여)": ["보건간호과","치의보건간호과","반려동물케어과"],
+  "상서고(남녀, 뷰티는 여)": ["연예매니지먼트과","제과제빵과","조리과","뷰티디자인과"],
+  "대구관광고(남녀)": ["관광호텔과","관광조리과","웹툰일러스트디자인과","뷰티코디네이션과"],
+  "달구벌고(남녀)": ["대안교육과"],
+  "경북기계공업고등학교": ["정밀기계과","자동화설비과","전기전자제어과"],
+  "대구소프트웨어마이스터고등학교": ["소프트웨어개발과","인공지능소프트웨어과"],
+  "대구농업마이스터고등학교": ["스마트농생명과","도시공간조경과","그린바이오산업과"],
+  "대구일마이스터고등학교": ["정밀기계가공과","금형설계제작과","생산자동화과"],
+  "대구반도체마이스터고등학교": ["반도체장비과","반도체소자과"],
+  "대구일과학고": ["이공계열"],
+  "대구외국어고": ["영어과"],
+  "대구국제고": ["국제계열"],
+  "대구체육고": ["육상과","수영과","체조과","축구과","배구과","농구과","야구과","소프트볼과","유도과","씨름과","태권도과","복싱과","역도과","사이클과"],
+  "경북예술고": ["음악과","미술과","무용과","뮤지컬연기과"]
+};
+
+const SCHOOL_NAMES = SCHOOL_GROUPS.flatMap(g=>g.schools);
+let currentUser = null;
+let currentClass = null;
+const expanded = {};
+// results: { "3-1": { "1-김경민": { school: "대구외국어고", custom: "" } } }
+const results = JSON.parse(localStorage.getItem('school_results') || '{}');
+
+function saveResults() {
+  localStorage.setItem('school_results', JSON.stringify(results));
+}
+
+// ── 로그인 ──
+function doLogin() {
+  const name = document.getElementById('inp-name').value.trim();
+  const pw = document.getElementById('inp-pw').value.trim();
+  const err = document.getElementById('login-err');
+  if (USERS[name] && String(USERS[name]) === String(pw)) {
+    currentUser = name;
+    currentClass = Object.entries(TEACHERS).find(([,v])=>v===name)?.[0] || null;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('welcome-msg').textContent = name + ' 선생님';
+    renderSchools();
+    renderResults();
+    renderOverview();
+    loadFromSheet();
+  } else {
+    err.style.display = 'block';
+    setTimeout(()=>err.style.display='none', 3000);
+  }
+}
+
+function doLogout() {
+  currentUser = null; currentClass = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-pw').value = '';
+}
+
+// ── 탭 ──
+function switchTab(tab, btn) {
+  ['schools','results','overview'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── 학교 정보 탭 ──
+function badgeClass(type) {
+  if(type==='특수목적고등학교') return 'b-special';
+  if(type==='마이스터고') return 'b-master';
+  if(type==='영재학교') return 'b-gifted';
+  if(type==='자율고') return 'b-auto';
+  if(type==='선지원 일반고') return 'b-voca';
+  if(type==='특성화고') return 'b-auto';
+  if(type==='타시도 일반고') return 'b-tasido';
+  return 'b-normal';
+}
+
+function parseFeature(text) {
+  if(!text) return '';
+
+  // | 구분자가 있으면 섹션 구조로 렌더링
+  if(text.includes('|')) {
+    const parts = text.split('|');
+    let html = '<ul class="feature-list">';
+    // 첫 파트는 일반 불릿
+    if(parts[0].trim()) {
+      html += `<li>${parts[0].trim()}</li>`;
+    }
+    // 이후: 헤더|내용 쌍으로 처리
+    let i = 1;
+    while(i < parts.length) {
+      const header = parts[i].trim();
+      const body = parts[i+1] ? parts[i+1].trim() : '';
+      if(body && !body.match(/^[12]학군/)) {
+        // 배정방법처럼 헤더+내용을 한 불릿으로
+        const bodyLines = body.split('\n').filter(Boolean)
+          .map(l => `<span style="display:block;padding-left:8px;color:var(--muted);font-size:.84rem;line-height:1.7">${l.trim()}</span>`).join('');
+        html += `<li><strong>${header}</strong>${bodyLines}</li>`;
+        i += 2;
+      } else {
+        // 학군처럼 헤더가 제목, 다음이 학교 목록
+        const schools = parts[i+1] ? parts[i+1].trim() : '';
+        html += `<li>
+          <strong>${header}</strong>
+          <span style="display:block;padding-left:4px;color:var(--muted);font-size:.84rem;line-height:1.75;margin-top:3px">${schools}</span>
+        </li>`;
+        i += 2;
+      }
+    }
+    html += '</ul>';
+    return html;
+  }
+
+  // 일반 텍스트는 기존 방식
+  const lines = text.split('\n').map(l => {
+    let s = l.replace(/^[-·•]\s*/, '').trim();
+    s = s.replace(/^학과:\s*/, '');
+    s = s.replace(/^※\s*/, '');
+    return s;
+  }).filter(Boolean);
+  return `<ul class="feature-list">${lines.map(l=>`<li>${l}</li>`).join('')}</ul>`;
+}
+
+function parseAdmission(text) {
+  if(!text) return '';
+  const lines = text.split('\n').map(l => l.replace(/^[-·•]\s*/, '').replace(/^※\s*/, '').trim()).filter(Boolean);
+  const STEP_RE = /^([0-9]+단계[^:：]*)[：:]\s*(.*)/;
+
+  let rows = [], steps = [];
+  lines.forEach(line => {
+    const stepMatch = line.match(STEP_RE);
+    if(stepMatch) {
+      steps.push({ num: stepMatch[1], desc: stepMatch[2] });
+    } else {
+      // 라벨: 내용 형태면 내용만 추출
+      const colonIdx = line.search(/[：:]/);
+      const knownLabels = ['모집인원','지원자격','전형방법','전형요소','지원방법','접수방법','모집정원','면접'];
+      const hasLabel = colonIdx > 0 && knownLabels.some(k => line.startsWith(k));
+      rows.push(hasLabel ? line.slice(colonIdx + 1).trim() : line);
+    }
+  });
+
+  let html = '';
+  if(rows.length) {
+    html += `<div class="admission-meta">${rows.map(r=>`<div class="admission-meta-row"><span class="admission-meta-value" style="padding-left:0">${r}</span></div>`).join('')}</div>`;
+  }
+  if(steps.length) {
+    html += `<div class="admission-steps"><div class="admission-steps-title">전형 단계</div>${steps.map(s=>`<div class="admission-step-item"><div class="admission-step-num">${s.num}</div><div class="admission-step-text">${s.desc}</div></div>`).join('')}</div>`;
+  }
+  return html || `<ul class="feature-list">${lines.map(l=>`<li>${l}</li>`).join('')}</ul>`;
+}
+
+function renderSchools() {
+  const q=document.getElementById('search').value.toLowerCase();
+  const ft=document.getElementById('filterType').value;
+  const term=document.getElementById('filterTerm').value;
+  const filtered=SCHOOLS.filter(s=>{
+    const mq=!q||s.name.toLowerCase().includes(q)||s.type.toLowerCase().includes(q)||(s.feature&&s.feature.toLowerCase().includes(q))||(s.admission&&s.admission.toLowerCase().includes(q));
+    return mq&&(!ft||s.type===ft)&&(!term||s.term===term);
+  });
+  document.getElementById('school-count').textContent=`검색 결과 ${filtered.length}개`;
+  if(!filtered.length){document.getElementById('school-list').innerHTML='<div class="no-result">검색 결과가 없습니다.</div>';return;}
+  document.getElementById('school-list').innerHTML=filtered.map(s=>{
+    const key=s.name, open=expanded[key];
+    const preview=s.feature?s.feature.replace(/\n/g,' ').replace(/^[-·]\s*/gm,'').slice(0,75)+(s.feature.length>75?'...':''):'자세히 보기를 눌러 정보를 확인하세요.';
+    const sk=key.replace(/'/g,"\\'");
+    return `<div class="card">
+      <span class="badge ${badgeClass(s.type)}">${s.type}</span>
+      <span class="badge ${s.term==='전기'?'b-jeon':'b-hu'}">${s.term}</span>
+      <div class="card-title">${s.name}</div>
+      <div class="card-preview">${preview}</div>
+      <div class="card-detail ${open?'open':''}">
+        ${s.feature?`<div class="detail-section"><div class="detail-label">학교 특징</div>${parseFeature(s.feature)}${s.note?`<div class="result-note" style="margin-top:8px">${s.note}</div>`:''}</div>`:''}
+        ${s.admission?`<div class="detail-section"><div class="detail-label">입학 전형</div>${parseAdmission(s.admission)}</div>`:''}
+        <div class="detail-section">
+          <div class="detail-label">합격 커트라인 (내신)</div>
+          ${s.deptCutline ? `
+          <table class="result-table">
+            <thead><tr><th>학과</th><th>일반전형</th><th>취업자전형</th></tr></thead>
+            <tbody>${s.deptCutline.map(d=>`<tr>
+              <td style="font-weight:500;text-align:left;padding-left:10px">${d.dept}</td>
+              <td>${d.general==='—'?`<span class="empty">—</span>`:d.general}</td>
+              <td>${d.employ==='—'?`<span class="empty">—</span>`:d.employ}</td>
+            </tr>`).join('')}</tbody>
+          </table>` : s.cutline ? `
+          <table class="result-table">
+            <thead><tr><th>연도</th><th>합격선</th></tr></thead>
+            <tbody>${s.cutline.map(c=>`<tr><td><strong>${c.year}년</strong></td><td style="font-weight:500">${c.score}</td></tr>`).join('')}</tbody>
+          </table>` : `
+          <table class="result-table">
+            <thead><tr><th>연도</th><th>일반 전형</th><th>사회통합</th><th>비고</th></tr></thead>
+            <tbody>
+              <tr><td><strong>2025</strong></td><td class="empty">미입력</td><td class="empty">미입력</td><td class="empty">—</td></tr>
+            </tbody>
+          </table>`}
+          <div class="result-note">※ 구글 시트 연동 후 자동으로 업데이트됩니다.</div>
+        </div>
+      </div>
+      <button class="toggle-btn" onclick="toggleCard('${sk}')">${open?'▲ 접기':'▼ 자세히 보기'}</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(key){expanded[key]=!expanded[key];renderSchools();}
+
+// ── 합격 입력 탭 ──
+function renderResults() {
+  if(!currentClass){
+    document.getElementById('results-content').innerHTML=`<div class="no-result">담당 반이 지정되지 않은 계정입니다.</div>`;
+    return;
+  }
+  const cls=currentClass;
+  const students=CLASSES[cls]||[];
+  const clsResults=results[cls]||{};
+  const done=Object.keys(clsResults).filter(k=>clsResults[k].school||clsResults[k].custom).length;
+
+  document.getElementById('results-content').innerHTML=`
+    <div class="class-header">
+      <div>
+        <h2>${cls}반 합격 현황 입력</h2>
+        <div class="class-meta">${currentUser} 선생님 · 총 ${students.length}명 · 입력 완료 ${done}명</div>
+      </div>
+      <button class="save-btn" style="background:#c0392b;font-size:.83rem;padding:.45rem 1.1rem" onclick="resetClass('${cls}')">🗑 전체 초기화</button>
+    </div>
+    <div class="student-table-wrap">
+      <table class="student-table">
+        <thead><tr><th style="width:40px">번호</th><th style="width:50px">성별</th><th style="width:82px">이름</th><th style="width:100px">내신 백분율</th><th>학교 검색</th><th style="width:140px">직접 입력 (목록 외)</th><th style="width:70px">상태</th></tr></thead>
+        <tbody>
+          ${students.map(st=>{
+            const k=`${st.num}-${st.name}`;
+            const r=clsResults[k]||{school:'',custom:'',cat:'',pct:'',dept:''};
+            const isDone=r.school||r.custom;
+            const ek=k.replace(/'/g,"\\'");
+            const uid=`ac-${cls}-${st.num}`;
+            const depts=SCHOOL_DEPTS[r.school]||[];
+            const deptOpts=depts.map(d=>`<option value="${d}" ${r.dept===d?'selected':''}>${d}</option>`).join('');
+            const deptVisible=depts.length&&r.school?'visible':'';
+            return `<tr>
+              <td style="text-align:center;color:var(--muted);font-size:.82rem">${st.num}</td>
+              <td style="text-align:center"><span class="${st.gender==='남'?'gender-m':'gender-f'}">${st.gender}</span></td>
+              <td style="font-weight:500">${st.name}</td>
+              <td>
+                <div class="pct-wrap">
+                  <input class="pct-input" type="number" min="0" max="100" step="0.1"
+                    placeholder="—" value="${r.pct||''}"
+                    oninput="saveCell('${cls}','${ek}','pct',this.value)">
+                  <span class="pct-unit">%</span>
+                </div>
+              </td>
+              <td>
+                <div class="ac-wrap" id="wrap-${uid}">
+                  <input class="ac-input${r.school?' has-value':''}" id="${uid}" type="text"
+                    placeholder="학교명 입력..." value="${r.school||''}"
+                    autocomplete="off"
+                    oninput="acInput('${uid}','${cls}','${ek}',this.value)"
+                    onfocus="acOpen('${uid}')"
+                    onkeydown="acKey(event,'${uid}','${cls}','${ek}')">
+                  <div class="ac-dropdown" id="dd-${uid}"></div>
+                </div>
+                <select class="dept-select ${deptVisible}" id="dept-${uid}"
+                  onchange="saveCell('${cls}','${ek}','dept',this.value)">
+                  <option value="">— 학과 선택 —</option>${deptOpts}
+                </select>
+              </td>
+              <td><input class="school-input" type="text" placeholder="직접 입력" value="${r.custom||''}" oninput="saveCell('${cls}','${ek}','custom',this.value)"></td>
+              <td style="text-align:center"><span class="status-badge ${isDone?'status-done':'status-none'}">${isDone?'완료':'미입력'}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div class="save-row">
+        <span class="save-msg" id="save-msg">저장되었습니다 ✓</span>
+        <div style="font-size:.82rem;color:var(--muted)">변경 시 자동 저장됩니다</div>
+      </div>
+    </div>`;
+}
+
+// ── 자동완성 ──
+let acFocusIdx = {};
+
+function acInput(uid, cls, key, q) {
+  const inp = document.getElementById(uid);
+  inp.classList.remove('has-value');
+  // 선택값 초기화
+  if(results[cls]?.[key]?.school) {
+    results[cls][key].school = '';
+    saveResults();
+    updateStatusBadge(uid, cls, key);
+  }
+  acRenderDropdown(uid, cls, key, q);
+}
+
+function acOpen(uid) {
+  const inp = document.getElementById(uid);
+  if(!inp.classList.contains('has-value')) {
+    acRenderDropdown(uid, '', '', inp.value);
+  }
+}
+
+function acRenderDropdown(uid, cls, key, q) {
+  const dd = document.getElementById('dd-'+uid);
+  if(!dd) return;
+  const trimQ = q.trim().toLowerCase();
+
+  // 전체 목록에서 검색 (구분 포함)
+  let html = '';
+  let totalCount = 0;
+
+  SCHOOL_GROUPS.forEach(g => {
+    const matched = g.schools.filter(s => !trimQ || s.toLowerCase().includes(trimQ));
+    if(!matched.length) return;
+    totalCount += matched.length;
+    html += `<div class="ac-group-label">${g.label}</div>`;
+    html += matched.map(s => {
+      const hl = trimQ ? s.replace(new RegExp(`(${trimQ})`, 'gi'), '<mark>$1</mark>') : s;
+      return `<div class="ac-item" onmousedown="acSelect('${uid}','${cls}','${key}','${s.replace(/'/g,"\\'")}')"> ${hl}</div>`;
+    }).join('');
+  });
+
+  if(!html) {
+    dd.innerHTML = `<div class="ac-empty">검색 결과가 없어요 — 아래 직접 입력 칸을 사용하세요</div>`;
+  } else {
+    dd.innerHTML = html;
+  }
+
+  dd.classList.add('open');
+  acFocusIdx[uid] = -1;
+
+  // 외부 클릭 시 닫기
+  setTimeout(() => {
+    const close = (e) => {
+      if(!document.getElementById('wrap-'+uid)?.contains(e.target)) {
+        dd.classList.remove('open');
+        document.removeEventListener('mousedown', close);
+      }
+    };
+    document.addEventListener('mousedown', close);
+  }, 10);
+}
+
+function acSelect(uid, cls, key, school) {
+  const inp = document.getElementById(uid);
+  if(inp) { inp.value = school; inp.classList.add('has-value'); }
+  document.getElementById('dd-'+uid)?.classList.remove('open');
+
+  // 학과 드롭다운 처리
+  const deptEl = document.getElementById('dept-'+uid);
+  if(deptEl) {
+    const depts = SCHOOL_DEPTS[school] || [];
+    if(depts.length) {
+      deptEl.innerHTML = `<option value="">— 학과 선택 —</option>` + depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+      deptEl.classList.add('visible');
+    } else {
+      deptEl.innerHTML = '';
+      deptEl.classList.remove('visible');
+    }
+    // 학과 초기화
+    if(cls && key) {
+      if(!results[cls]) results[cls]={};
+      if(!results[cls][key]) results[cls][key]={school:'',custom:'',cat:'',pct:'',dept:''};
+      results[cls][key].dept = '';
+    }
+  }
+
+  if(cls && key) saveCell(cls, key, 'school', school);
+}
+
+function acKey(e, uid, cls, key) {
+  const dd = document.getElementById('dd-'+uid);
+  if(!dd || !dd.classList.contains('open')) return;
+  const items = dd.querySelectorAll('.ac-item');
+  if(!items.length) return;
+  let idx = acFocusIdx[uid] ?? -1;
+  if(e.key === 'ArrowDown') { e.preventDefault(); idx = Math.min(idx+1, items.length-1); }
+  else if(e.key === 'ArrowUp') { e.preventDefault(); idx = Math.max(idx-1, 0); }
+  else if(e.key === 'Enter' && idx >= 0) {
+    e.preventDefault();
+    const school = items[idx].textContent.trim();
+    acSelect(uid, cls, key, school);
+    return;
+  } else if(e.key === 'Escape') { dd.classList.remove('open'); return; }
+  else return;
+  acFocusIdx[uid] = idx;
+  items.forEach((el,i) => el.classList.toggle('focused', i===idx));
+  items[idx]?.scrollIntoView({block:'nearest'});
+}
+
+function updateStatusBadge(uid, cls, key) {
+  const inp = document.getElementById(uid);
+  const tr = inp?.closest('tr');
+  if(!tr) return;
+  const r = results[cls]?.[key] || {};
+  const isDone = r.school || r.custom;
+  const badge = tr.querySelector('.status-badge');
+  if(badge) { badge.className='status-badge '+(isDone?'status-done':'status-none'); badge.textContent=isDone?'완료':'미입력'; }
+}
+
+function resetClass(cls) {
+  if(!confirm(`${cls}반 입력 데이터를 전체 초기화할까요?\nFirebase에서도 삭제됩니다.`)) return;
+  results[cls] = {};
+  saveResults();
+  renderResults();
+  renderOverview();
+  clearClassData(cls);
+}
+
+function onCatChange(cls, key, sel) {}  // 구형 호환용 빈 함수
+
+function saveCell(cls, key, field, value) {
+  if(!results[cls]) results[cls]={};
+  if(!results[cls][key]) results[cls][key]={school:'',custom:'',cat:'',pct:'',dept:''};
+  results[cls][key][field]=value;
+  saveResults();
+  const isDone=results[cls][key].school||results[cls][key].custom;
+  const tr=event.target.closest('tr');
+  if(tr){const badge=tr.querySelector('.status-badge');if(badge){badge.className='status-badge '+(isDone?'status-done':'status-none');badge.textContent=isDone?'완료':'미입력';}}
+  // Firebase에 해당 학생 저장 (디바운스 1.5초)
+  clearTimeout(saveCell._t);
+  saveCell._t = setTimeout(() => syncToSheet(cls, key, results[cls][key]), 1500);
+  renderOverview();
+}
+
+// ── 전체 현황 탭 ──
+function renderOverview() {
+  const grid=document.getElementById('overview-grid');
+  if(!grid) return;
+  grid.innerHTML=Object.entries(TEACHERS).map(([cls,teacher])=>{
+    const students=CLASSES[cls]||[];
+    const clsR=results[cls]||{};
+    const done=students.filter(st=>{const r=clsR[`${st.num}-${st.name}`];return r&&(r.school||r.custom);}).length;
+    const pct=students.length?Math.round(done/students.length*100):0;
+    return `<div class="ov-card" onclick="showOvDetail('${cls}')">
+      <h3>${cls}반</h3>
+      <div class="ov-teacher">${teacher} 선생님</div>
+      <div class="ov-progress"><div class="ov-bar" style="width:${pct}%"></div></div>
+      <div class="ov-count">${done} / ${students.length}명 입력 완료 (${pct}%)</div>
+    </div>`;
+  }).join('');
+}
+
+function showOvDetail(cls) {
+  const students=CLASSES[cls]||[];
+  const clsR=results[cls]||{};
+  const teacher=TEACHERS[cls];
+  document.getElementById('overview-detail').innerHTML=`
+    <div class="ov-detail">
+      <div class="ov-detail-header">
+        <h3>${cls}반 (${teacher} 선생님) — 합격 현황</h3>
+        <button class="close-btn" onclick="document.getElementById('overview-detail').innerHTML=''">닫기</button>
+      </div>
+      <table class="student-table">
+        <thead><tr><th>번호</th><th>이름</th><th>성별</th><th>내신 백분율</th><th>합격 학교</th><th>학과</th></tr></thead>
+        <tbody>${students.map(st=>{
+          const r=clsR[`${st.num}-${st.name}`]||{};
+          const school=r.custom||r.school||'';
+          const pct=r.pct?r.pct+'%':'—';
+          const dept=r.dept||'—';
+          return `<tr>
+            <td style="text-align:center;color:var(--muted);font-size:.82rem">${st.num}</td>
+            <td style="font-weight:500">${st.name}</td>
+            <td style="text-align:center"><span class="${st.gender==='남'?'gender-m':'gender-f'}">${st.gender}</span></td>
+            <td style="text-align:center;font-size:.84rem">${pct}</td>
+            <td>${school?`<span class="status-badge status-done">${school}</span>`:'<span class="status-badge status-none">미입력</span>'}</td>
+            <td style="font-size:.83rem;color:var(--muted)">${school&&r.dept?dept:'—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  document.getElementById('overview-detail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── Firebase 설정 ──
+const firebaseConfig = {
+  apiKey: "AIzaSyA16C6IyDdb6iNe0kX9-3tEMqiT4Xx3Yuk",
+  authDomain: "posanm-highschool-info.firebaseapp.com",
+  databaseURL: "https://posanm-highschool-info-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "posanm-highschool-info",
+  storageBucket: "posanm-highschool-info.firebasestorage.app",
+  messagingSenderId: "14183203344",
+  appId: "1:14183203344:web:b8e89410f97d00749f8095"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);
+
+function saveResults() {
+  // 로컬 저장은 유지 (빠른 렌더링용)
+  localStorage.setItem('school_results', JSON.stringify(results));
+}
+
+function showSyncMsg(msg, isErr=false) {
+  const el = document.getElementById('save-msg');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.color = isErr ? '#c0392b' : 'var(--success)';
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 2500);
+}
+
+// 학생 1명 Firebase에 저장
+function syncToSheet(cls, key, studentData) {
+  if(!cls || !key) return;
+  const r = studentData || results[cls]?.[key] || {};
+  if(!r.school && !r.custom && !r.pct) return;
+  const safeCls = cls.replace(/-/g, '_');
+  const safeKey = key.replace(/[.#$\[\]]/g, '_');
+  set(ref(db, `results/${safeCls}/${safeKey}`), {
+    school: r.school||'', custom: r.custom||'',
+    dept: r.dept||'', pct: r.pct||'',
+    updatedAt: new Date().toLocaleString('ko-KR')
+  }).then(() => showSyncMsg('✓ 저장됐어요'))
+    .catch(() => showSyncMsg('⚠ 저장 실패', true));
+}
+
+// 해당 반 전체 Firebase에서 삭제
+function clearClassData(cls) {
+  const safeCls = cls.replace(/-/g, '_');
+  remove(ref(db, `results/${safeCls}`))
+    .then(() => showSyncMsg('✓ 초기화됐어요'))
+    .catch(() => showSyncMsg('⚠ 초기화 실패', true));
+}
+
+// Firebase 실시간 리스너 — 데이터 변경 시 자동 반영
+function startRealtimeSync() {
+  onValue(ref(db, 'results'), (snapshot) => {
+    const data = snapshot.val();
+    if(!data) return;
+    Object.entries(data).forEach(([safeCls, students]) => {
+      const cls = safeCls.replace(/_/g, '-');
+      if(!results[cls]) results[cls] = {};
+      Object.entries(students).forEach(([safeKey, val]) => {
+        const key = safeKey.replace(/_/g, '-');
+        results[cls][key] = {
+          school: val.school||'', custom: val.custom||'',
+          dept: val.dept||'', pct: val.pct||'', cat:''
+        };
+      });
+    });
+    saveResults();
+    renderResults();
+    renderOverview();
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+    const el = document.getElementById('last-sync-time');
+    if(el) el.textContent = `마지막 갱신: ${timeStr}`;
+  });
+}
+
+// 수동 불러오기 버튼
+function manualLoad(btn) {
+  btn.textContent = '불러오는 중...';
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+  get(ref(db, 'results')).then(snapshot => {
+    const data = snapshot.val();
+    if(data) {
+      Object.entries(data).forEach(([safeCls, students]) => {
+        const cls = safeCls.replace(/_/g, '-');
+        if(!results[cls]) results[cls] = {};
+        Object.entries(students).forEach(([safeKey, val]) => {
+          const key = safeKey.replace(/_/g, '-');
+          results[cls][key] = {
+            school: val.school||'', custom: val.custom||'',
+            dept: val.dept||'', pct: val.pct||'', cat:''
+          };
+        });
+      });
+      saveResults();
+      renderResults();
+      renderOverview();
+      showSyncMsg('✓ 최신 데이터를 불러왔어요');
+    } else {
+      showSyncMsg('데이터가 없어요');
+    }
+  }).catch(() => showSyncMsg('⚠ 불러오기 실패', true))
+    .finally(() => {
+      btn.textContent = '↻ 지금 불러오기';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    });
+}
+
+// 로그인 후 실시간 동기화 시작
+setTimeout(() => { if(currentUser) startRealtimeSync(); }, 500);
+
+</script>
+</body>
+</html>
