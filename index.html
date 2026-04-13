@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>포산중학교 고입 정보 시스템</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
 <!-- Firebase -->
@@ -1036,7 +1039,6 @@ function applyFirebaseData(data) {
     Object.entries(data).forEach(([safeCls, students]) => {
       if(!students) return;
       Object.entries(students).forEach(([safeKey, val]) => {
-        // cls와 key는 Firebase에 원본으로 저장해뒀음
         const cls = val.cls || safeCls;
         const key = val.key || safeKey;
         if(!sheetResults[cls]) sheetResults[cls] = {};
@@ -1047,16 +1049,19 @@ function applyFirebaseData(data) {
       });
     });
   }
-  Object.keys(sheetResults).forEach(cls => {
-    results[cls] = sheetResults[cls];
+
+  // 모든 반을 Firebase 기준으로 덮어씌우기
+  // Firebase에 있는 반 → sheetResults로 교체
+  // Firebase에 없는 반 → 빈 객체로 초기화
+  const allClasses = Object.keys(TEACHERS);
+  allClasses.forEach(cls => {
+    if(sheetResults[cls]) {
+      results[cls] = sheetResults[cls];
+    } else {
+      results[cls] = {};
+    }
   });
-  // Firebase에서 삭제된 반 로컬도 초기화
-  if(data) {
-    Object.keys(results).forEach(cls => {
-      const safeCls = cls.replace(/[.#$\[\]/]/g, '-');
-      if(!data[safeCls]) results[cls] = {};
-    });
-  }
+
   saveResults();
   renderResults();
   renderOverview();
